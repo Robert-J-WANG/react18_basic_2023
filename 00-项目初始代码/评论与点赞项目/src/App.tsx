@@ -1,7 +1,5 @@
 import "./index.css";
 import avatar from "./images/avatar.png";
-
-// 完成 评论数据渲染  tab内容渲染  评论列表点赞和点踩  三个视图渲染
 // 依赖的数据
 const state = {
   // hot: 热度排序  time: 时间排序
@@ -56,17 +54,8 @@ function App() {
         {/* 排序 */}
         <div className="tabs-order">
           <ul className="sort-container">
-            {/* 渲染排序标签 */}
-            {state.tabs.map((tab) => (
-              <li
-                key={tab.id}
-                className={`${tab.type === state.active && "on"}`}
-                //  或者这样
-                // className={`${tab.type === state.active ? "on" : " "}`}
-              >
-                按{tab.name}排序
-              </li>
-            ))}
+            <li className="on">按热度排序</li>
+            <li>按时间排序</li>
           </ul>
         </div>
 
@@ -77,8 +66,8 @@ function App() {
           </div>
           <div className="textarea-container">
             <textarea
-              cols={80}
-              rows={5}
+              cols="80"
+              rows="5"
               placeholder="发条友善的评论"
               className="ipt-txt"
             />
@@ -92,28 +81,25 @@ function App() {
 
         {/* 评论列表 */}
         <div className="comment-list">
-          {/* 渲染评论列表 */}
-          {state.list.map((item) => (
-            <div key={item.id} className="list-item">
-              <div className="user-face">
-                <img className="user-head" src={avatar} alt="" />
-              </div>
-              <div className="comment">
-                <div className="user">{item.author}</div>
-                <p className="text">{item.comment}</p>
-                <div className="info">
-                  <span className="time">{item.time.toString()}</span>
-                  <span className={`like ${item.attitude === 1 && "liked"}`}>
-                    <i className="icon" />
-                  </span>
-                  <span className={`hate ${item.attitude === -1 && "hated"}`}>
-                    <i className="icon" />
-                  </span>
-                  <span className="reply btn-hover">删除</span>
-                </div>
+          <div className="list-item">
+            <div className="user-face">
+              <img className="user-head" src={avatar} alt="" />
+            </div>
+            <div className="comment">
+              <div className="user">尤雨溪</div>
+              <p className="text">前排吃瓜</p>
+              <div className="info">
+                <span className="time">2021-10-08 09:05:00</span>
+                <span className="like liked">
+                  <i className="icon" />
+                </span>
+                <span className="hate hated">
+                  <i className="icon" />
+                </span>
+                <span className="reply btn-hover">删除</span>
               </div>
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>
