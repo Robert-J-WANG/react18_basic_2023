@@ -1,9 +1,15 @@
 import "./index.css";
 import avatar from "./images/avatar.png";
+import { useState } from "react";
 
-// 完成 评论数据渲染  tab内容渲染  评论列表点赞和点踩  三个视图渲染
+/* ------------------------- 完成 ------------------------- */
+/* 
+1. tab点击切换激活状态交互
+2. 完成发表评论功能
+ */
+
 // 依赖的数据
-const state = {
+const initstate = {
   // hot: 热度排序  time: 时间排序
   tabs: [
     {
@@ -46,6 +52,8 @@ const state = {
   ],
 };
 function App() {
+  // 使用useState钩子管理状态
+  const [state, setState] = useState(initstate);
   return (
     <div className="App">
       <div className="comment-container">
@@ -60,9 +68,10 @@ function App() {
             {state.tabs.map((tab) => (
               <li
                 key={tab.id}
-                className={`${tab.type === state.active && "on"}`}
+                // className={`${tab.type === state.active && "on"}`}
                 //  或者这样
-                // className={`${tab.type === state.active ? "on" : " "}`}
+                className={tab.type === state.active ? "on" : ""}
+                onClick={() => setState({ ...state, active: tab.type })}
               >
                 按{tab.name}排序
               </li>
@@ -103,10 +112,34 @@ function App() {
                 <p className="text">{item.comment}</p>
                 <div className="info">
                   <span className="time">{item.time.toString()}</span>
-                  <span className={`like ${item.attitude === 1 && "liked"}`}>
+                  <span
+                    className={`like ${item.attitude === 1 && "liked"}`}
+                    onClick={() =>
+                      setState({
+                        ...state,
+                        list: state.list.map((comment) =>
+                          comment.id === item.id
+                            ? { ...comment, attitude: 1 }
+                            : comment
+                        ),
+                      })
+                    }
+                  >
                     <i className="icon" />
                   </span>
-                  <span className={`hate ${item.attitude === -1 && "hated"}`}>
+                  <span
+                    className={`hate ${item.attitude === -1 && "hated"}`}
+                    onClick={() =>
+                      setState({
+                        ...state,
+                        list: state.list.map((comment) =>
+                          comment.id === item.id
+                            ? { ...comment, attitude: -1 }
+                            : comment
+                        ),
+                      })
+                    }
+                  >
                     <i className="icon" />
                   </span>
                   <span className="reply btn-hover">删除</span>

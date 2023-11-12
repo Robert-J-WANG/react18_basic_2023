@@ -62,7 +62,7 @@ function App() {
                 key={tab.id}
                 className={`${tab.type === state.active && "on"}`}
                 //  或者这样
-                // className={`${tab.type === state.active ? "on" : " "}`}
+                //  className={tab.type === state.active ? "on" : ""}
               >
                 按{tab.name}排序
               </li>
