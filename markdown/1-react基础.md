@@ -694,7 +694,34 @@
     
         + 可以通过开发者工具查看hooks状态
     
-    5. ##### 阶段小练习：
+    5. 受控表单的使用
+    
+    + 概念: 
+    
+        + 使用React组件的状态(useState)控制表单的状态
+
+    + 原理：
+
+        + React(state) -> state绑定到input的 value属性 -> <Input/>(value)
+        + <Input/>(value) -> 把input最新的value值设置给state -> React(state)
+    
+    + 步骤：
+    
+        + 准备一个React状态值
+    
+        ```JSX
+        const [value, setValue] = useState("");
+        ```
+    
+        + 通过value属性绑定状态，通过onChange属性绑定状态同步的函数
+    
+        ```tsx
+         <input placeholder="发条友善的评论" className="ipt-txt" value={value} onChange={(e) => {setValue(e.target.value)}}/>
+        ```
+    
+        
+    
+    6. 阶段小练习：
     
     + 拉取项目模板到本地，安装依赖，run起来项目
         https://gitee.com/react-course-series/react-component-demo 
@@ -729,7 +756,7 @@
         
     
         6. 动态类名的优化：使用classnames库
-    
+
         ```jsx
         <div className={classNames("nav-item",{active:type===item.type})}></div>
         ```
@@ -757,26 +784,136 @@
                 </div>
         ```
 
-        
-    
-        7. 完成发表评论功能
-            + 使用受控表单绑定
-        8. 注意：生成独立无二的id 可以使用  uuid 包  `yarn add uuid` 
-    
-        ```jsx
-        import { v4 as uuid } from 'uuid'
-        uuid() // 得到一个独一无二的id
-        ```
-    
-    #### 
 
-+ #### useEffect
 
 + #### useRef
+
+    1. 用途：
+
+    + 在 React 组件中获取/操作 DOM，需要使用 useRef React Hook钩子函数
+
+    2. 步骤：
+
+    + 使用useRef创建 ref 对象，并与 JSX 绑定
+
+        ```jsx
+        const inputRef = useRef(null)
+        ```
+
+        ```jsx
+        <input type="text" ref={inputRef} />
+        ```
+
+    + 在DOM可用时，通过inputRef.current拿到DOM对象
+
+        + 注意：只有在页面渲染完毕，DOM生成之后才可用
+
+        ```jsx
+        console.log(inputRef.current)  // 获取到input
+        ```
+
+        3. 阶段小练习：完成上面案例的其他功能
+
+            1. 发布评论：
+                + 获取评论内容：使用受控组件绑定状态变量
+
+            ```jsx
+            const [value, setValue] = useState("");
+            
+             <textarea
+                          cols={80}
+                          rows={5}
+                          placeholder="发条友善的评论"
+                          className="ipt-txt"
+                          // （1）获取评论内容：使用受控组件绑定状态变量
+                          value={value}
+                          onChange={(e) => {
+                            setValue(e.target.value);
+                          }}
+                        />
+            ```
+
+            + 点击按钮发布：在原列表的基础上，添加新的list,重新渲染
+
+            ```tsx
+            const handlePublish = () => {
+                setCommentList([
+                  ...commentList,
+                  {
+                    rpid: 100,
+                    user: {
+                      uid: "30009257",
+                      avatar: avatar,
+                      uname: "黑马前端",
+                    },
+                    content: value,
+                    ctime: "10-19 09: 00",
+                    like: 66,
+                  },
+                ]);
+              };
+            ```
+
+            2. id和时间的优化处理
+                + 使用uuid/nanoid库生成随机id
+                +  使用dayjs库格式化时间
+
+            ```jsx
+            const handlePublish = () => {
+                setCommentList([
+                  ...commentList,
+                  {
+                    rpid: v4(), // 随机id
+                    user: {
+                      uid: "30009257",
+                      avatar: avatar,
+                      uname: "黑马前端",
+                    },
+                    content: value,
+                    ctime: dayjs(new Date()).format("DD-MM hh:mm"), //格式化时间
+                    like: 66,
+                  },
+                ]);
+              };
+            ```
+
+            3.  清空内容，重新聚焦
+                + 清空内容：把控制input框的value状态设置为空串
+                + 重新聚焦：拿到input的dom元素（useRef)，调用focus方法
+
+            ```tsx
+             // （1）获取评论内容：使用受控组件绑定状态变量
+              const [value, setValue] = useState("");
+              // const inputRef = useRef(null);
+              const inputRef = useRef<HTMLTextAreaElement | null>(null);
+              // （2）点击按钮发布：在原列表的基础上，添加新的list,重新渲染
+            
+            const handlePublish = () => {
+                ...
+            // + 清空内容：把控制input框的value状态设置为空串
+                setValue("");
+                // + 重新聚焦：拿到input的dom元素（useRef)，调用focus方法
+                inputRef.current?.focus();
+                ...
+            }
+            ```
+
+            
+
+
+
++ #### useEffect
 
 + #### 自定义hook
 
 + #### 智能组件和UI组件
+
++ #### 使用到的库
+
+    1. Loads: 函数库，比如排序
+    2. Classnames：动态类名
+    3. Uuid/nanoid: 随机id
+    4. Dayjs: 格式化时间
 
 
 
