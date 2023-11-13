@@ -1,3 +1,5 @@
+
+
 # React18_2023 + TypeScript + Vite
 
 ### Part 1-react基础
@@ -697,11 +699,70 @@
     + 拉取项目模板到本地，安装依赖，run起来项目
         https://gitee.com/react-course-series/react-component-demo 
     
-    + 完成tab点击切换激活状态交互
+    + 需求与功能
     
-    + 完成发表评论功能
-        注意：生成独立无二的id 可以使用  uuid 包  `yarn add uuid` 
+        1. 渲染数据：状态变量控制数据的渲染，使用map函数
+        2. 只有当前用户才显示删除按钮 ：条件判断，使用逻辑与&&中断
+        3. 删除评论：匹配当前评论id与列表中评论的id,使用filter函数过滤
+        4. 点击tab标签高亮显示：获取当前标签的type（或ID），与列表中的type（或ID）相同的, 添加高亮类名，  条件判断，使用逻辑与&&中断
+        5. 排序功能：把评论列表状态数据进行不同的排序处理，当成新值传给set函数，重新渲染视图
+            + 使用lodash库里的排序函数 
+    
+        ```jsx
+        import _ from "lodash";
+        
+        const handlerType = (type: string) => {
+            setType(type);
+        
+            /* ---- 4. 排序功能：把评论列表状态数据进行不同的排序处理，当成新值传给set函数，重新渲染视图 --- */
+            // 使用lodash
+            if (type === "hot") {
+              // 按点赞数排序
+              setCommentList(_.orderBy(commentList, "like", "desc")); // _.orderBy(哪个列表？, 哪个字段？, 怎么排序？)
+            } else {
+              // 按点时间排序
+              setCommentList(_.orderBy(commentList, "ctime", "desc"));
+            }
+          };
+        ```
+    
+        
+    
+        6. 动态类名的优化：使用classnames库
+    
+        ```jsx
+        <div className={classNames("nav-item",{active:type===item.type})}></div>
+        ```
+    
+        + classNames("已有的固定的类名",{动态类名:判断条件})* 
+    
+        ```jsx
+        import classNames from "classnames";
+        
+        {/* 排序 */}
+                <div className="tabs-order">
+                  <ul className="sort-container">
+                    {/* 渲染排序标签 */}
+                    {tabs.map((tab) => (
+                      <li
+                        key={tab.type}
+                        // 2. 通过记录的type和每一项遍历时的type做匹配，来控制高亮类名的显示
+                        className={classNames({ on: tab.type === type })}
+                        onClick={() => handlerType(tab.type)}
+                      >
+                        按{tab.text}排序
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+        ```
 
+        
+    
+        7. 完成发表评论功能
+            + 使用受控表单绑定
+        8. 注意：生成独立无二的id 可以使用  uuid 包  `yarn add uuid` 
+    
         ```jsx
         import { v4 as uuid } from 'uuid'
         uuid() // 得到一个独一无二的id
