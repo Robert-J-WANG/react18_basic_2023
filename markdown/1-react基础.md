@@ -1387,7 +1387,127 @@
 
         
 
-+ #### 智能组件和UI组件
++ #### 案例优化
+
+    1. 使用请求接口的方式获取评论列表并渲染
+
+        + 使用 json-server 工具模拟接口服务, 通过 axios 发送接口请求
+
+            + json-server是一个快速以.json文件作为数据源模拟接口服务的工具
+
+                1. 安装
+
+                ```bash
+                yarn add json-server -D
+                ```
+
+                2. 模拟服务端数据
+
+                    + 根目录下新建JSON文件db.json
+
+                    ```json
+                    {
+                      "list": [
+                        {
+                          "rpid": 3,
+                          "user": {
+                            "uid": "13258165",
+                            "avatar": "http://toutiao.itheima.net/resources/images/98.jpg",
+                            "uname": "周杰伦"
+                          },
+                          "content": "哎哟，不错哦",
+                          "ctime": "10-18 08: 15",
+                          "like": 126
+                        },
+                        {
+                          "rpid": 2,
+                          "user": {
+                            "uid": "36080105",
+                            "avatar": "http://toutiao.itheima.net/resources/images/98.jpg",
+                            "uname": "许嵩"
+                          },
+                          "content": "我寻你千百度 日出到迟暮",
+                          "ctime": "11-13 11: 29",
+                          "like": 88
+                        },
+                        {
+                          "rpid": 1,
+                          "user": {
+                            "uid": "30009257",
+                            "avatar": "http://toutiao.itheima.net/resources/images/98.jpg",
+                            "uname": "黑马前端"
+                          },
+                          "content": "学前端就来黑马",
+                          "ctime": "10-19 09: 00",
+                          "like": 66
+                        }
+                      ]
+                    }
+                    ```
+
+                3. 配置文件package.json中设置服务端口
+
+                    ```json
+                    "scripts": {
+                        "start": "react-scripts start",
+                        "build": "react-scripts build",
+                        "test": "react-scripts test",
+                        "eject": "react-scripts eject",
+                        // 配置服务器端口
+                        "serve": "json-server db.json --port 3004"
+                      },
+                    ```
+
+                4. 运行服务器
+
+                    ```
+                    yarn serve
+                    ```
+
+                5. 获得数据端口地址
+
+                    ```
+                    http://localhost:3004/list
+                    ```
+
+            + axios是一个广泛使用的前端请求库
+
+                1. 安装axios
+
+                    ```
+                    yarn add axios
+                    ```
+
+                2. 导入axios,并在组件中使用
+
+                    ```
+                    import axios from "axios";
+                    ```
+
+        + 使用 useEffect 调用接口获取数据
+
+            ```tsx
+            import axios from "axios";
+            ...
+            function App() {
+              // 使用 useEffect 调用接口获取数据
+              const [commentList, setCommentList] = useState<any[]>([]);
+              useEffect(() => {
+                const fetchData = async () => {
+                  const res = await axios.get("http://localhost:3004/list");
+                  setCommentList(res.data);
+                };
+                fetchData();
+              }, []);
+            ...
+            }
+            ```
+
+            
+
+    2. 使用自定义Hook函数封装数据请求的逻辑
+
+    3. 把评论中的每一项抽象成一个独立的组件实现渲染
 
 + #### 使用到的库
 
