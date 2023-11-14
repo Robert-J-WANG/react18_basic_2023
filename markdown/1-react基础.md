@@ -1541,12 +1541,91 @@
 
     3. 把评论中的每一项抽象成一个独立的组件实现渲染
 
+        + 抽象原则:
+
+            + App作为“智能组件”负责数据的获取，
+            + Item作为“UI组件”负责数据的渲染
+
+        + 代码实现
+
+            ```tsx
+            type TItmePros = {
+              item: any;
+              del: (id: string) => void;
+            };
+            
+            // 抽离出Item作为“UI组件”负责数据的渲染
+            const Item = ({ item, del }: TItmePros) => {
+              return (
+                <div key={item.rpid} className="list-item">
+                  <div className="user-face">
+                    <img className="user-head" src={item.user.avatar} alt="" />
+                  </div>
+                  <div className="comment">
+                    <div className="user">{item.user.uname}</div>
+                    <p className="text">{item.content}</p>
+                    <div className="info">
+                      <span className="time">{item.ctime.toString()}</span>
+                      <span className="time">点赞数{item.like}</span>
+                      {/* 只有是自己的评论才显示删除按钮-条件并判断 */}
+                      {/* {判断条件：item.user.uid===user.uid} */}
+                      {item.user.uid === user.uid && (
+                        <span className="reply btn-hover" onClick={() => del(item.rpid)}>
+                          删除
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            };
+            
+            // 自定义一个hook，用来获取服务器list数据
+            const useGetList = () => {
+              // 使用 useEffect 调用接口获取数据
+              const [commentList, setCommentList] = useState<any[]>([]);
+              useEffect(() => {
+                const getList = async () => {
+                  const res = await axios.get("http://localhost:3004/list");
+                  setCommentList(res.data);
+                };
+                getList();
+              }, []);
+              return { commentList, setCommentList };
+            };
+            
+            function App() {
+              // 使用自定义hook，解构出需要使用到的状态和方法
+              const { commentList, setCommentList } = useGetList();
+            
+              // 删除评论的回调
+              const handlerDel = (id: string) => {
+                setCommentList(commentList.filter((list) => list.rpid !== id));
+              };
+            ...
+            return(
+            	...
+            	{/* 评论列表 */}
+                    <div className="comment-list">
+                      {/* 渲染评论列表 */}
+                      {commentList.map((item) => (
+                        <Item key={item.id} item={item} del={handlerDel} />
+                      ))}
+                    </div>
+                ...
+            )}
+            ```
+
+            
+
 + #### 使用到的库
 
     1. Lodash: 函数库，比如排序
     2. Classnames：动态类名
     3. Uuid/nanoid: 随机id
     4. Dayjs: 格式化时间
+    5. Json-serser: 模式json服务器，提供json数据
+    6. Axios: 调用服务器端口，获取数据
 
 
 
