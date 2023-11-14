@@ -569,7 +569,207 @@
         export default App
         ```
     
-    3. ##### useStat
++ #### 组件通信
+
+    1. 概念:
+
+    + 组件通信就是组件之间的数据传递，根据组件嵌套关系的不同，有不同的通信方法
+
+    2. 通信方法：
+
+    + 父子通信-父传子
+
+        + 父传子-基础实现
+    
+            1. 父组件传递数据 - 在子组件标签上绑定属性
+            2. 子组件接收数据 - 子组件通过props参数接收数据
+    
+        + 父传子-props说明
+    
+            1. props可传递任意的数据： 数字、字符串、布尔值、数组、对象、函数、JSX
+    
+            ```TSX
+            <Son
+              name={appName}
+              age={18}
+              isTrue={false}
+              list={["Vue", "react"]}
+              obj={{ name: "jack", age: 99 }}
+              fcn={() => console.log(123)}
+              child={<span>this is a span </span>}
+            />
+            ```
+
+            2. props是只读对象
+                + 子组件只能读取props中的数据，不能直接进行修改
+                + 父组件的数据只能由父组件修改
+    
+        + 父传子 - 特殊的prop children
+    
+            1. 场景: 当我们把内容嵌套在子组件标签中时，父组件会自动在名为children的prop属性中接收该内容
+    
+            ```tsx
+            <Son>
+            	<span>this is a span </span>
+            </Son>
+            ```
+    
+            ```jsx
+            pros 
+            	children:<span/>
+            	new entry:""
+            ```
+    
+    + 父子通信-子传父
+    
+        1. 核心思路
+    
+            + 在子组件中调用父组件中的函数并传递参数
+    
+            ```jsx
+            // 子组件
+            function Son ({ onGetSonMsg }) {
+              // Son组件中的数据
+              const sonMsg = 'this is son msg'
+              return (
+                <div>
+                  this is Son
+                  <button onClick={() => onGetSonMsg(sonMsg)}>sendMsg</button>
+                </div>
+              )
+            }
+            ```
+    
+            ```jsx
+            // 父组件
+            function App () {
+              const [msg, setMsg] = useState('')
+              const getMsg = (msg) => {
+                console.log(msg)
+                setMsg(msg)
+              }
+              return (
+                <div>
+                  this is App, {msg}
+                  <Son onGetSonMsg={getMsg} />
+                </div>
+              )
+            }
+            
+            export default App
+            ```
+    
+    + 兄弟组件通信 - 使用状态提升实现
+    
+        1. 实现思路
+    
+            + 借助“状态提升”机制，通过父组件进行兄弟组件之间的数据传递
+    
+        2. 步骤
+    
+            +  A组件先通过子传父的方式把数据传给父组件App
+            + App拿到数据后通过父传子的方式再传递给B组件
+    
+        3. 代码演示
+    
+            ```jsx
+            // 1. 通过子传父 A -> App
+            // 2. 通过父传子 App -> B
+            
+            import { useState } from "react"
+            
+            function A ({ onGetAName }) {
+              // Son组件中的数据
+              const name = 'this is A name'
+              return (
+                <div>
+                  this is A compnent,
+                  <button onClick={() => onGetAName(name)}>send</button>
+                </div>
+              )
+            }
+            
+            function B ({ name }) {
+              return (
+                <div>
+                  this is B compnent,
+                  {name}
+                </div>
+              )
+            }
+            
+            function App () {
+              const [name, setName] = useState('')
+              const getAName = (name) => {
+                console.log(name)
+                setName(name)
+              }
+              return (
+                <div>
+                  this is App
+                  <A onGetAName={getAName} />
+                  <B name={name} />
+                </div>
+              )
+            }
+            
+            export default App
+            ```
+    
+    + 跨层级组件通信: 使用Context机制
+    
+        1. 实现步骤:
+    
+            + 使用createContext方法创建一个上下文对象Ctx
+            +  在顶层组件(App)中通过 Ctx.Provider 组件提供数据
+            + 在底层组件(B)中通过 useContext 钩子函数获取消费数据
+    
+        2. 代码演示
+    
+            ```jsx
+            // App -> A -> B
+            
+            import { createContext, useContext } from "react"
+            // 1. createContext方法创建一个上下文对象
+            const MsgContext = createContext()
+            
+            function A () {
+              return (
+                <div>
+                  this is A component
+                  <B />
+                </div>
+              )
+            }
+            
+            function B () {
+                // 3. 在底层组件 通过useContext钩子函数使用数据
+              const msg = useContext(MsgContext)
+              return (
+                <div>
+                  this is B compnent,{msg}
+                </div>
+              )
+            }
+            
+            function App () {
+                // 2. 在顶层组件 通过Provider组件提供数据
+              const msg = 'this is app msg'
+              return (
+                <div>
+                  <MsgContext.Provider value={msg}>
+                    this is App
+                    <A />
+                  </MsgContext.Provider>
+                </div>
+              )
+            }
+            
+            export default App
+            
+            ```
+    
+            
     
 + #### Hooks 基础
 
