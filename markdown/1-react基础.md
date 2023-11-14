@@ -1299,11 +1299,99 @@
 
 + #### 自定义hook
 
+    1. 概念:
+
+        + 自定义Hook是以 use 打头的函数，通过自定义Hook函数可以用来实现逻辑的封装和复用
+
+    2. 封装自定义hook通用思路：
+
+        + 声明一个以use打头的函数
+        + 在函数体内封装可复用的逻辑（只要是可复用的逻辑）
+        + 把组件中用到的状态或者回调return出去（以对象或者数组）
+        + 在哪个组件中要用到这个逻辑，就执行这个函数，解构出来状态和回调进行使用
+
+    3. 代码实现： 不封装直接实现 -> 封装自定义Hook实现 -> 抽象实现的通用逻辑
+
+        ```jsx
+        // 封装自定义Hook
+        
+        // 问题: 布尔切换的逻辑 当前组件耦合在一起的 不方便复用
+        
+        // 解决思路: 自定义hook
+        
+        import { useState } from "react"
+        
+        function useToggle () {
+          // 可复用的逻辑代码
+          const [value, setValue] = useState(true)
+        
+          const toggle = () => setValue(!value)
+        
+          // 哪些状态和回调函数需要在其他组件中使用 return
+          return {
+            value,
+            toggle
+          }
+        }
+        
+        function App () {
+          const { value, toggle } = useToggle()
+          return (
+            <div>
+              {value && <div>this is div</div>}
+              <button onClick={toggle}>toggle</button>
+            </div>
+          )
+        }
+        
+        export default App
+        ```
+
++ #### React Hooks使用规则
+
+    1. 规则
+
+        + 只能在组件中或者其他自定义Hook函数中调用
+        + 只能在组件的顶层调用，不能嵌套在 if、for、其他函数中
+
+    2. 错误演示
+
+        + 在组件中外面使用
+
+        ```jsx
+        const [ value, setValue ] = useState( ' ')
+        function App ( ) {
+        	return ( 
+        		<div>
+        			this is App
+                </div>
+        	)
+        }
+        ```
+
+        + 在条件判断中使用
+
+        ```jsx
+        
+        function App ( ) {
+        	if ( Math.random ( ) > 0.5 ){
+        		const [ value, setValue ] = useState( ' ')
+        	}
+        	return ( 
+        		<div>
+        			this is App
+                </div>
+        	)
+        }
+        ```
+
+        
+
 + #### 智能组件和UI组件
 
 + #### 使用到的库
 
-    1. Loads: 函数库，比如排序
+    1. Lodash: 函数库，比如排序
     2. Classnames：动态类名
     3. Uuid/nanoid: 随机id
     4. Dayjs: 格式化时间
