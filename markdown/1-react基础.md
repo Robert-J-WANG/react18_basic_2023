@@ -1493,11 +1493,11 @@
               // 使用 useEffect 调用接口获取数据
               const [commentList, setCommentList] = useState<any[]>([]);
               useEffect(() => {
-                const fetchData = async () => {
+                const getList = async () => {
                   const res = await axios.get("http://localhost:3004/list");
                   setCommentList(res.data);
                 };
-                fetchData();
+                getList();
               }, []);
             ...
             }
@@ -1506,6 +1506,38 @@
             
 
     2. 使用自定义Hook函数封装数据请求的逻辑
+
+        + 自定义一个hook，将获取数据的功能进行抽封
+
+        + 在钩子中return需要使用到的状态和方法
+
+        + 在组件内部调用自定义钩子，并解构出状态和方法进行使用
+
+            ```tsx
+            ...
+            // 自定义一个hook，用来获取服务器list数据
+            const useGetList = () => {
+              // 使用 useEffect 调用接口获取数据
+              const [commentList, setCommentList] = useState<any[]>([]);
+              useEffect(() => {
+                const getList = async () => {
+                  const res = await axios.get("http://localhost:3004/list");
+                  setCommentList(res.data);
+                };
+                getList();
+              }, []);
+              return { commentList, setCommentList };
+            };
+            
+            function App() {
+            
+              // 组件内部使用自定义hook，解构出需要使用到的状态和方法
+              const { commentList, setCommentList } = getList();
+            	...
+            }
+            ```
+
+            
 
     3. 把评论中的每一项抽象成一个独立的组件实现渲染
 
