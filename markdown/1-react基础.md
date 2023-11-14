@@ -1100,9 +1100,202 @@
 
             
 
-
-
 + #### useEffect
+
+    1. useEffect 的概念理解:
+
+    + useEffect是一个React Hook函数，用于在React组件中创建不是由事件引起而是由渲染本身引起的操作(副作用), 比 如发送AJAX请求，更改DOM等等
+
+    2. 举例说明：一个组件渲染完毕，需要从服务器要数据
+
+    + 上面的组件中没有发生任何的用户事件，组件渲染完毕之后就需要和服务器要数据，整个过程属于“只由渲染引起的操作”
+
+    3. useEffect 的基础使用
+
+    + 需求:在组件渲染完毕之后，立刻从服务端获取频道列表数据并显示到页面中
+
+    + 语法:
+
+        ```jsx
+        useEffect( ( )=>{ }, [ ] )
+        ```
+
+    + 说明：
+
+        + 参数1是一个函数，可以把它叫做副作用函数，在函数内部可以放置要执行的操作
+        + 参数2是一个数组(可选参)，在数组里放置依赖项，不同依赖项会影响第一个参数函数的执行，
+        + 当是一个空数组的时候，副作用函数只会在组件渲染完毕之后执行一次
+        + 接口地址:http://geek.itheima.net/v1_0/channels
+
+    + 代码演示：
+
+        ```jsx
+        import { useEffect, useState } from "react"
+        
+        const URL = 'http://geek.itheima.net/v1_0/channels'
+        
+        function App () {
+          // 创建一个状态数据
+          const [list, setList] = useState([])
+          useEffect(() => {
+            // 额外的操作 获取频道列表
+            async function getList () {
+              const res = await fetch(URL)
+              const jsonRes = await res.json()
+              console.log(jsonRes)
+              setList(jsonRes.data.channels)
+            }
+            getList()
+          }, [])
+          return (
+            <div>
+              this is app
+              <ul>
+                {list.map(item => <li key={item.id}>{item.name}</li>)}
+              </ul>
+            </div>
+          )
+        }
+        
+        export default App
+        ```
+
+    4. useEffect 依赖项参数说明
+
+    + useEffect副作用函数的执行时机存在多种情况，根据传入依赖项的不同，会有不同的执行表现
+
+        |     依赖项     |         副作用函数执行时机          |
+        | :------------: | :---------------------------------: |
+        |   没有依赖项   |    组件初始渲染 + 组件更新时执行    |
+        |   空数组依赖   |       只在初始渲染时执行一次        |
+        | 添加特定依赖项 | 组件初始渲染 + 特性依赖项变化时执行 |
+
+    + 没有依赖项
+
+        ```jsx
+        import { useEffect, useState } from "react"
+        
+        function App () {
+          // 1. 没有依赖项  初始 + 组件更新
+          const [count, setCount] = useState(0)
+          useEffect(() => {
+          console.log('副作用函数执行了')
+         })
+          return (
+            <div>
+              this is app
+              <button onClick={() => setCount(count + 1)}>+{count}</button>
+            </div>
+          )
+        }
+        
+        export default App
+        
+        ```
+
+    + 空数组依赖
+
+        ```jsx
+        import { useEffect, useState } from "react"
+        
+        function App () {
+          const [count, setCount] = useState(0)
+          // 2. 传入空数组依赖  初始执行一次
+         useEffect(() => {
+          console.log('副作用函数执行了')
+          }, [])
+            
+          return (
+            <div>
+              this is app
+              <button onClick={() => setCount(count + 1)}>+{count}</button>
+            </div>
+          )
+        }
+        
+        export default App
+        
+        ```
+
+    + 添加特定依赖项
+
+        ```jsx
+        import { useEffect, useState } from "react"
+        
+        function App () {
+          const [count, setCount] = useState(0)
+          
+          // 3. 传入特定依赖项  初始 + 依赖项变化时执行
+          useEffect(() => {
+            console.log('副作用函数执行了')
+          }, [count])
+        
+          return (
+            <div>
+              this is app
+              <button onClick={() => setCount(count + 1)}>+{count}</button>
+            </div>
+          )
+        }
+        
+        export default App
+        
+        ```
+
+    5. useEffect — 清除副作用
+
+    + 在useEffect中编写的由渲染本身引起的对接组件外部的操作，社区也经常把它叫做副作用操作
+
+    + 比如在useEffect中开 启了一个定时器，我们想在组件卸载时把这个定时器再清理掉，这个过程就是清理副作用
+
+        ```jsx
+        useEffect( ( )=>{
+            // 显示副作用操作的逻辑
+            return ( )=>{
+            // 这里清除副作用
+            }
+        })
+        ```
+
+    + 说明：
+
+        + 清除副作用的函数最常见的执行时机是在组件卸载时自动执行
+
+    + 代码显示：需求 -> 在Son组件渲染时开启一个定制器，卸载时清除这个定时器
+
+        ```jsx
+        import { useEffect, useState } from "react"
+        
+        function Son () {
+          // 1. 渲染时开启一个定时器
+          useEffect(() => {
+            const timer = setInterval(() => {
+              console.log('定时器执行中...')
+            }, 1000)
+        
+            return () => {
+              // 清除副作用(组件卸载时)
+              clearInterval(timer)
+            }
+          }, [])
+          return <div>this is son</div>
+        }
+        
+        function App () {
+          // 通过条件渲染模拟组件卸载
+          const [show, setShow] = useState(true)
+          return (
+            <div>
+              {show && <Son />}
+              <button onClick={() => setShow(false)}>卸载Son组件</button>
+            </div>
+          )
+        }
+        
+        export default App
+        ```
+
+    
 
 + #### 自定义hook
 
